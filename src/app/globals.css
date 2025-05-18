@@ -4,6 +4,22 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  ::selection {
+    background-color: rgba(229, 9, 20, 0.3);
+    color: white;
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
+
 :root {
   --background: #0a0a0a;
   --surface: #141414;
