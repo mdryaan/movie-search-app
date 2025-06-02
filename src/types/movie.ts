@@ -27,6 +27,7 @@ export interface MovieDetails extends Movie {
   spoken_languages: SpokenLanguage[]
   homepage: string | null
   imdb_id: string | null
+  origin_country?: string[]
 }
 
 export interface Genre {
