@@ -1,83 +1,53 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Movie, MovieDetails } from '@/types/movie'
+import { Movie } from '@/types/movie'
 import { MovieDetailsResponse } from '@/types/api'
 import { getPopular, getTopRated, getNowPlaying, getMovieDetails } from '@/lib/tmdb'
 
-interface UseMoviesState {
+interface MoviesState {
   movies: Movie[]
   loading: boolean
   error: string | null
 }
 
-interface UseMovieDetailsState {
+interface MovieDetailsState {
   movie: MovieDetailsResponse | null
   loading: boolean
   error: string | null
 }
 
-export function usePopularMovies(page = 1): UseMoviesState {
-  const [state, setState] = useState<UseMoviesState>({
-    movies: [],
-    loading: true,
-    error: null,
-  })
+function useMovieList(fetcher: (page: number) => Promise<{ results: Movie[] }>, page: number): MoviesState {
+  const [state, setState] = useState<MoviesState>({ movies: [], loading: true, error: null })
 
   useEffect(() => {
-    setState((prev) => ({ ...prev, loading: true, error: null }))
-    getPopular(page)
+    setState({ movies: [], loading: true, error: null })
+    fetcher(page)
       .then((data) => setState({ movies: data.results, loading: false, error: null }))
       .catch((err: Error) => setState({ movies: [], loading: false, error: err.message }))
-  }, [page])
+  }, [fetcher, page])
 
   return state
 }
 
-export function useTopRatedMovies(page = 1): UseMoviesState {
-  const [state, setState] = useState<UseMoviesState>({
-    movies: [],
-    loading: true,
-    error: null,
-  })
-
-  useEffect(() => {
-    setState((prev) => ({ ...prev, loading: true, error: null }))
-    getTopRated(page)
-      .then((data) => setState({ movies: data.results, loading: false, error: null }))
-      .catch((err: Error) => setState({ movies: [], loading: false, error: err.message }))
-  }, [page])
-
-  return state
+export function usePopularMovies(page = 1): MoviesState {
+  return useMovieList(getPopular, page)
 }
 
-export function useNowPlayingMovies(page = 1): UseMoviesState {
-  const [state, setState] = useState<UseMoviesState>({
-    movies: [],
-    loading: true,
-    error: null,
-  })
-
-  useEffect(() => {
-    setState((prev) => ({ ...prev, loading: true, error: null }))
-    getNowPlaying(page)
-      .then((data) => setState({ movies: data.results, loading: false, error: null }))
-      .catch((err: Error) => setState({ movies: [], loading: false, error: err.message }))
-  }, [page])
-
-  return state
+export function useTopRatedMovies(page = 1): MoviesState {
+  return useMovieList(getTopRated, page)
 }
 
-export function useMovieDetails(id: number): UseMovieDetailsState {
-  const [state, setState] = useState<UseMovieDetailsState>({
-    movie: null,
-    loading: true,
-    error: null,
-  })
+export function useNowPlayingMovies(page = 1): MoviesState {
+  return useMovieList(getNowPlaying, page)
+}
+
+export function useMovieDetails(id: number): MovieDetailsState {
+  const [state, setState] = useState<MovieDetailsState>({ movie: null, loading: true, error: null })
 
   useEffect(() => {
     if (!id) return
-    setState((prev) => ({ ...prev, loading: true, error: null }))
+    setState({ movie: null, loading: true, error: null })
     getMovieDetails(id)
       .then((data) => setState({ movie: data, loading: false, error: null }))
       .catch((err: Error) => setState({ movie: null, loading: false, error: err.message }))
