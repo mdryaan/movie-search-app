@@ -1,4 +1,4 @@
-import { GENRE_COLORS } from '@/lib/constants'
+import { GENRE_COLORS, GENRES } from '@/lib/constants'
 
 interface GenreBadgeProps {
   genreId: number
@@ -8,7 +8,6 @@ interface GenreBadgeProps {
 
 export function GenreBadge({ genreId, name, size = 'md' }: GenreBadgeProps) {
   const colorClass = GENRE_COLORS[genreId] ?? 'bg-gray-500/20 text-gray-400 border-gray-500/30'
-
   const sizeClass = size === 'sm' ? 'text-xs px-2 py-0.5' : 'text-sm px-3 py-1'
 
   return (
@@ -26,9 +25,7 @@ interface GenreBadgeListProps {
 }
 
 export function GenreBadgeList({ genreIds, genreNames = {}, maxDisplay = 3, size = 'md' }: GenreBadgeListProps) {
-  const { GENRES } = require('@/lib/constants')
   const names: Record<number, string> = { ...GENRES, ...genreNames }
-
   const visibleGenres = genreIds.slice(0, maxDisplay)
 
   return (
