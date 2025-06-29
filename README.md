@@ -1,6 +1,6 @@
 # 🎬 CineVault — Discover Your Next Favorite Film
 
-> A modern, cinematic movie discovery platform built with Next.js 14, TypeScript, and Tailwind CSS.
+CineVault is a full-featured cinematic movie discovery platform where you can explore what's trending daily or weekly, search thousands of titles with instant results, browse by genre, dive into rich movie detail pages with cast and trailers, and curate a personal watchlist that persists across sessions — all powered by live TMDB data and wrapped in a sleek dark glassmorphism UI built with Next.js 14, TypeScript, and Tailwind CSS.
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -9,6 +9,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-brightgreen?style=for-the-badge)](https://your-demo-url.vercel.app)
+
+---
+
+![CineVault Home](./public/home.png)
 
 ---
 
@@ -30,11 +34,62 @@
 
 ## 📸 Screenshots
 
-> _Screenshots section — add your own after running locally_
+| | |
+|:---:|:---:|
+| ![Movie Detail](./public/details.png) | ![Watchlist](./public/watchlist.png) |
+| ![Search](./public/search.png) | ![Browse by Genre](./public/filter.png) |
 
-| Home | Movie Detail | Watchlist |
-|------|-------------|-----------|
-| ![Home](./screenshots/home.png) | ![Detail](./screenshots/detail.png) | ![Watchlist](./screenshots/watchlist.png) |
+---
+
+## 🏗 Architecture
+
+> Copy the Mermaid code below and paste it at [https://mermaid.live](https://mermaid.live) to generate the diagram, then add the image yourself.
+
+```mermaid
+graph TD
+    Browser["🌐 Browser"]
+
+    subgraph app["⚡ Next.js 14 App Router"]
+        Layout["RootLayout (Server)"]
+        WatchlistProvider["WatchlistProvider\nReact Context — shared state"]
+        Header["Header (Client)"]
+
+        subgraph pages["Pages"]
+            Home["/ Home"]
+            Detail["/movie/[id]"]
+            Search["/search"]
+            Watchlist["/watchlist"]
+        end
+
+        subgraph components["UI Components"]
+            HeroSection["HeroSection"]
+            MovieCard["MovieCard"]
+            WatchlistButton["WatchlistButton"]
+            GenreFilter["GenreFilter"]
+        end
+
+        subgraph hooks["Custom Hooks"]
+            useWatchlist["useWatchlist"]
+            useMovies["useMovies"]
+            useTrending["useTrending"]
+            useDebounce["useDebounce"]
+        end
+
+        LocalStorage[("💾 localStorage\nWatchlist Persistence")]
+    end
+
+    TMDB["🎬 TMDB REST API"]
+
+    Browser --> Layout
+    Layout --> WatchlistProvider
+    WatchlistProvider --> Header
+    WatchlistProvider --> pages
+    pages --> components
+    components --> hooks
+    hooks --> useWatchlist --> LocalStorage
+    hooks --> useMovies --> TMDB
+    hooks --> useTrending --> TMDB
+```
 
 ---
 
@@ -50,8 +105,8 @@
 ### 2. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/movie-search-app.git
-cd movie-search-app
+git clone https://github.com/mdryaan/CinaVault.git
+cd CinaVault
 ```
 
 ### 3. Install Dependencies
@@ -62,13 +117,11 @@ npm install
 
 ### 4. Configure Environment Variables
 
-Create a `.env.local` file in the root of the project:
-
 ```bash
 cp .env.example .env.local
 ```
 
-Then edit `.env.local` and add your TMDB API key:
+Edit `.env.local` and add your TMDB API key:
 
 ```env
 NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_api_key_here
@@ -81,68 +134,6 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## 🗂 Project Structure
-
-```
-movie-search-app/
-├── .env.example
-├── .env.local              # your secrets (gitignored)
-├── .gitignore
-├── next.config.js
-├── tailwind.config.ts
-├── tsconfig.json
-├── package.json
-├── public/
-│   └── placeholder.png
-└── src/
-    ├── app/
-    │   ├── layout.tsx
-    │   ├── page.tsx
-    │   ├── HomePageClient.tsx
-    │   ├── globals.css
-    │   ├── search/
-    │   │   └── page.tsx
-    │   ├── movie/
-    │   │   └── [id]/
-    │   │       └── page.tsx
-    │   └── watchlist/
-    │       └── page.tsx
-    ├── components/
-    │   ├── layout/
-    │   │   ├── Header.tsx
-    │   │   ├── Footer.tsx
-    │   │   └── Navigation.tsx
-    │   ├── ui/
-    │   │   ├── MovieCard.tsx
-    │   │   ├── MovieCardSkeleton.tsx
-    │   │   ├── MovieRow.tsx
-    │   │   ├── HeroSection.tsx
-    │   │   ├── GenreBadge.tsx
-    │   │   ├── RatingStars.tsx
-    │   │   ├── SearchBar.tsx
-    │   │   ├── WatchlistButton.tsx
-    │   │   └── ErrorState.tsx
-    │   └── sections/
-    │       ├── TrendingSection.tsx
-    │       ├── PopularSection.tsx
-    │       ├── TopRatedSection.tsx
-    │       └── GenreFilter.tsx
-    ├── hooks/
-    │   ├── useWatchlist.ts
-    │   ├── useDebounce.ts
-    │   ├── useMovies.ts
-    │   └── useTrending.ts
-    ├── lib/
-    │   ├── tmdb.ts
-    │   ├── constants.ts
-    │   └── utils.ts
-    └── types/
-        ├── movie.ts
-        └── api.ts
-```
 
 ---
 
@@ -162,10 +153,17 @@ movie-search-app/
 | TypeScript (strict) | Type safety |
 | Tailwind CSS | Styling, animations |
 | TMDB API | Movie data source |
+| React Context | Shared watchlist state |
 | localStorage | Watchlist persistence |
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
 ---
 
 ## 📄 License
 
-MIT © CineVault
+MIT © Md Raiyan — see [LICENSE](LICENSE) for details.
